@@ -103,13 +103,13 @@ public:
     SingleLinkedList& operator=(const SingleLinkedList& rhs) {
         if (this != &rhs) {
             SingleLinkedList<Type> tmp(rhs);
-            swap(tmp);
+            Swap(tmp);
         }
 
         return *this;
     }
 
-    void swap(SingleLinkedList& other) noexcept {
+    void Swap(SingleLinkedList& other) noexcept {
         std::swap(size_, other.size_);
         Node* tmp = head_.next_node;
         head_.next_node = other.head_.next_node;
@@ -149,7 +149,7 @@ public:
         while (head_.next_node != nullptr) {
             Node& tmp = *head_.next_node;
             head_.next_node = tmp.next_node;
-            delete& tmp;
+            delete &tmp;
         }
         size_ = 0u;
     }
@@ -218,28 +218,26 @@ private:
                 cur = (*cur).next_node;
                 tmp.size_++;
             }
-        }
-        catch (const std::bad_alloc&) {
+        } catch (const std::bad_alloc&) {
             tmp.Clear();
             throw;
         }
 
-        swap(tmp);
+        Swap(tmp);
     }
 };
 
 
 template <typename Type>
 void swap(SingleLinkedList<Type>& lhs, SingleLinkedList<Type>& rhs) noexcept {
-    lhs.swap(rhs);
+    lhs.Swap(rhs);
 }
 
 template <typename Type>
 bool operator==(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
     if (lhs.GetSize() == rhs.GetSize()) {
         return std::equal(lhs.begin(), lhs.end(), rhs.begin());
-    }
-    else {
+    } else {
         return false;
     }
 }
@@ -275,13 +273,11 @@ void Test1() {
     struct DeletionSpy {
         DeletionSpy() = default;
         explicit DeletionSpy(int& instance_counter) noexcept
-            : instance_counter_ptr_(&instance_counter)  
-        {
+            : instance_counter_ptr_(&instance_counter) {
             OnAddInstance();
         }
         DeletionSpy(const DeletionSpy& other) noexcept
-            : instance_counter_ptr_(other.instance_counter_ptr_)  
-        {
+            : instance_counter_ptr_(other.instance_counter_ptr_) {
             OnAddInstance();
         }
         DeletionSpy& operator=(const DeletionSpy& rhs) noexcept {
@@ -365,13 +361,11 @@ void Test1() {
             : countdown_ptr(&copy_counter) {
         }
         ThrowOnCopy(const ThrowOnCopy& other)
-            : countdown_ptr(other.countdown_ptr)  
-        {
+            : countdown_ptr(other.countdown_ptr) {
             if (countdown_ptr) {
                 if (*countdown_ptr == 0) {
                     throw std::bad_alloc();
-                }
-                else {
+                } else {
                     --(*countdown_ptr);
                 }
             }
@@ -395,8 +389,7 @@ void Test1() {
                 list.PushFront(ThrowOnCopy(copy_counter));
                 // Если метод не выбросил исключение, список должен перейти в новое состояние
                 assert(list.GetSize() == 2);
-            }
-            catch (const std::bad_alloc&) {
+            } catch (const std::bad_alloc&) {
                 exception_was_thrown = true;
                 // После выбрасывания исключения состояние списка должно остаться прежним
                 assert(list.GetSize() == 1);
@@ -536,7 +529,7 @@ void Test3() {
         const auto old_first_size = first.GetSize();
         const auto old_second_size = second.GetSize();
 
-        first.swap(second);
+        first.Swap(second);
 
         assert(second.begin() == old_first_begin);
         assert(first.begin() == old_second_begin);
@@ -617,13 +610,11 @@ void Test3() {
             : countdown_ptr(&copy_counter) {
         }
         ThrowOnCopy(const ThrowOnCopy& other)
-            : countdown_ptr(other.countdown_ptr)  
-        {
+            : countdown_ptr(other.countdown_ptr) {
             if (countdown_ptr) {
                 if (*countdown_ptr == 0) {
                     throw std::bad_alloc();
-                }
-                else {
+                } else {
                     --(*countdown_ptr);
                 }
             }
@@ -656,8 +647,7 @@ void Test3() {
             dst_list = src_list;
             // Ожидается исключение при присваивании
             assert(false);
-        }
-        catch (const std::bad_alloc&) {
+        } catch (const std::bad_alloc&) {
             // Проверяем, что состояние списка-приёмника не изменилось
             // при выбрасывании исключений
             assert(dst_list.GetSize() == 2);
@@ -668,8 +658,7 @@ void Test3() {
             assert(it != dst_list.end());
             assert(it->countdown_ptr == &dst_counter);
             assert(dst_counter == 10);
-        }
-        catch (...) {
+        } catch (...) {
             // Других типов исключений не ожидается
             assert(false);
         }
@@ -750,13 +739,11 @@ void Test4() {
             : countdown_ptr(&copy_counter) {
         }
         ThrowOnCopy(const ThrowOnCopy& other)
-            : countdown_ptr(other.countdown_ptr)  
-        {
+            : countdown_ptr(other.countdown_ptr) {
             if (countdown_ptr) {
                 if (*countdown_ptr == 0) {
                     throw std::bad_alloc();
-                }
-                else {
+                } else {
                     --(*countdown_ptr);
                 }
             }
@@ -777,8 +764,7 @@ void Test4() {
                 int copy_counter = max_copy_counter;
                 list.InsertAfter(list.cbegin(), ThrowOnCopy(copy_counter));
                 assert(list.GetSize() == 4u);
-            }
-            catch (const std::bad_alloc&) {
+            } catch (const std::bad_alloc&) {
                 exception_was_thrown = true;
                 assert(list.GetSize() == 3u);
                 break;
